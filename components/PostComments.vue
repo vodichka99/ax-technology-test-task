@@ -14,21 +14,18 @@
 <script setup lang="ts">
 import type {IComment} from "@/model/comments";
 
-const scrollTop = ref()
-const scrollTopPrev = ref()
+const scrollDown = ref<boolean>()
+const emit = defineEmits(["scrollDown"])
 
-function onWheel(e: Event) {
-  const el = e.target as HTMLElement
-  scrollTopPrev.value = scrollTop.value
-  scrollTop.value = el.scrollTop
-
-  if (scrollTop.value > 0 && scrollTop.value === scrollTopPrev.value) console.log("scroll down")
+function onWheel() {
+  if (scrollDown.value) {
+    emit("scrollDown")
+  }
+  scrollDown.value = true
 }
 
-function onScroll(e: Event) {
-  const el = e.target as HTMLElement
-  scrollTopPrev.value = scrollTop.value
-  scrollTop.value = el.scrollTop
+function onScroll() {
+  scrollDown.value = false
 }
 
 export interface IPostCommentsProps {

@@ -4,7 +4,7 @@
       <h3 class="post-info-title">{{ info?.title }}</h3>
       <span class="post-info-body">{{ info?.body }}</span>
     </div>
-    <post-comments :comments="comments" @scrollDown="loadComments"/>
+    <post-comments :comments="comments" @scrollDown="onScrollDown"/>
   </div>
 </template>
 <script setup lang="ts">
@@ -29,11 +29,19 @@ export interface IPostComment {
 const route = useRoute()
 const info = ref<IPost>()
 const comments = ref<IPostComment[]>([])
+const commentsPage = ref(1)
 
 function loadComments(postId: number) {
-  getComments(1, 10, postId).then(async r => {
-    comments.value = await r.json()
+  getComments(postId, commentsPage.value, 5).then(async r => {
+    const data = await r.json()
+    if (comments.value) comments.value = [...comments.value, ...data]
+    else comments.value = data
+    commentsPage.value += 1
   })
+}
+
+function onScrollDown() {
+  loadComments(+route.params.id)
 }
 
 function loadPost() {
